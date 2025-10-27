@@ -52,7 +52,6 @@ export default function RecommenderPage() {
       <h1 className="text-3xl font-bold mb-2">Researcher Recommendation</h1>
       <p className="text-slate-400 mb-8">Enter a research topic to find the most relevant experts from the institution.</p>
       
-      {/* --- UPDATED DROPDOWNS --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">Select Model</label>
@@ -104,7 +103,7 @@ export default function RecommenderPage() {
             name={researcher.name}
             score={researcher.score}
             faculty={researcher.faculty}
-            metric={metric} // Pass the metric to the card for smart labeling
+            metric={metric} 
           />
         ))}
       </div>
