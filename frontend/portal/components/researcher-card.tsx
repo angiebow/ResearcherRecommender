@@ -7,11 +7,16 @@ interface ResearcherCardProps {
   name: string;
   score: number;
   faculty: string;
+  metric: string; 
 }
 
-export default function ResearcherCard({ rank, name, score, faculty }: ResearcherCardProps) {
+export default function ResearcherCard({ rank, name, score, faculty, metric }: ResearcherCardProps) {
+  const isDistanceMetric = ['Minkowski', 'Kullback-Leibler'].includes(metric);
+  const scoreLabel = isDistanceMetric ? "Distance" : "Similarity Score";
+  const scoreSuffix = isDistanceMetric ? "(Lower is better)" : "(Higher is better)";
+
   return (
-    <Card className="bg-slate-950 border-slate-800 hover:border-blue-500 transition-colors">
+    <Card className="bg-slate-950 border-slate-800 hover:border-blue-500 transition-colors flex flex-col justify-between">
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg">{name}</CardTitle>
@@ -21,8 +26,9 @@ export default function ResearcherCard({ rank, name, score, faculty }: Researche
       </CardHeader>
       <CardContent>
         <div className="text-sm">
-          Similarity Score: 
+          {scoreLabel}: 
           <span className="font-bold text-blue-400 ml-2">{score.toFixed(4)}</span>
+          <p className="text-xs text-slate-500 mt-1">{scoreSuffix}</p>
         </div>
       </CardContent>
     </Card>
