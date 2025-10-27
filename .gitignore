@@ -1,0 +1,11 @@
+# Ignore Python virtual environments
+venv/
+backend/venv/
+frontend/portal/node_modules/
+
+# Ignore Python cache files
+__pycache__/
+backend/__pycache__/
+
+# Ignore Next.js build folder
+frontend/portal/.next/
