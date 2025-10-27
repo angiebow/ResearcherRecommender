@@ -28,7 +28,7 @@ def l2_normalize(vector):
 
 app = FastAPI(title="Researcher Recommendation API")
 
-origins = ["http://localhost:3000"] 
+origins = ["*"] 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
