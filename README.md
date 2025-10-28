@@ -1,7 +1,7 @@
 # 🔬 Researcher Recommender
 
 [![Frontend - Vercel](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://researcher-recommender-git-main-angiebows-projects.vercel.app/)
-[![Backend - Hugging Face Spaces](https://img.shields.io/badge/Backend-HF%20Spaces-yellow?style=for-the-badge&logo=huggingface)](https://angiebow-researcher-topic.hf.space)
+[![Backend - Hugging Face Spaces](https://img.shields.io/badge/Backend-HF%20Spaces-yellow?style=for-the-badge&logo=huggingface)](https://huggingface.co/spaces/angiebow/researcher-topic/tree/main)
 
 A full-stack application that uses **transformer-based language models** to recommend **relevant researchers** based on user-input research topics.  
 This project moves beyond keyword-based retrieval to provide **semantically rich, context-aware** recommendations.
