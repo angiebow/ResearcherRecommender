@@ -11,7 +11,9 @@ type Researcher = {
   name: string;
   score: number;
   faculty: string;
-  focus_topics: string[]; 
+  department: string;
+  research_center: string;
+  focus_topics: string[];
 };
 
 export default function RecommenderPage() {
@@ -49,9 +51,10 @@ export default function RecommenderPage() {
     }
   };
 
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-2">Researcher Recommendation</h1>
+       <h1 className="text-3xl font-bold mb-2">Researcher Recommendation</h1>
       <p className="text-slate-400 mb-8">Enter a research topic to find the most relevant experts from the institution.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -73,7 +76,7 @@ export default function RecommenderPage() {
           <Select value={metric} onValueChange={setMetric}>
             <SelectTrigger className="bg-slate-800 border-slate-700 h-12 text-md"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Cosine Similarity">Cosine Similarity</SelectItem>
+              <SelectItem value="Cosine Similarity">Cosine</SelectItem>
               <SelectItem value="Hamming">Hamming</SelectItem>
               <SelectItem value="Jaccard">Jaccard</SelectItem>
               <SelectItem value="Minkowski">Minkowski</SelectItem>
@@ -95,9 +98,9 @@ export default function RecommenderPage() {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {isLoading && (
-          Array.from({ length: 6 }).map((_, i) => <ResearcherCardSkeleton key={i} />)
+          Array.from({ length: 8 }).map((_, i) => <ResearcherCardSkeleton key={i} />)
         )}
         {!isLoading && results.map((researcher, index) => (
           <ResearcherCard
@@ -106,8 +109,10 @@ export default function RecommenderPage() {
             name={researcher.name}
             score={researcher.score}
             faculty={researcher.faculty}
+            department={researcher.department}
+            research_center={researcher.research_center}
             metric={metric} 
-            focus_topics={researcher.focus_topics} 
+            focus_topics={researcher.focus_topics}
           />
         ))}
       </div>

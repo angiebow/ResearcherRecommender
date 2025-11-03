@@ -1,7 +1,9 @@
+# backend/main.py
 import pickle
 import numpy as np
 import pandas as pd
 import torch
+import os # Import os to handle file paths
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +14,7 @@ from scipy.spatial.distance import hamming, minkowski, jaccard
 from scipy.special import softmax, kl_div
 from tqdm import tqdm
 
+# --- Helper Functions ---
 def mean_pooling(model_output, attention_mask):
     token_embeddings = model_output[0]
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
@@ -42,6 +45,7 @@ class Query(BaseModel):
     model: str
     metric: str
 
+# --- Model Mappings ---
 MODEL_MAPPING = {
     "BERT": {"name": 'bert-base-multilingual-cased', "type": "transformers"},
     "DistilBERT": {"name": 'sentence-transformers/distilbert-base-nli-stsb-mean-tokens', "type": "transformers"},
@@ -57,15 +61,20 @@ EMBEDDING_MAPPING = {
     "MPNet": "data/MPNetResearcher.pkl",
 }
 
+# --- Caches ---
 loaded_models = {}
 loaded_embeddings = {}
 researcher_to_center_map = {}
 top_topics_map = {}
+researcher_to_faculty_map = {}   
+researcher_to_department_map = {} 
 
 @app.on_event("startup")
 def load_data_on_startup():
     """Load all necessary data files into memory when the server starts."""
     print("--- Server starting up: Pre-loading data... ---")
+    
+    # --- 1. Load PKL files (and strip keys) ---
     for model_name, file_path in EMBEDDING_MAPPING.items():
         try:
             with open(file_path, 'rb') as f:
@@ -75,6 +84,7 @@ def load_data_on_startup():
         except FileNotFoundError:
             print(f"⚠️ WARNING: Embedding file not found for {model_name} at '{file_path}'")
 
+    # --- 2. Load Center metadata (and strip keys) ---
     try:
         df_metadata = pd.read_csv('data/MergedResearchCenterWithTopic.csv')
         global researcher_to_center_map
@@ -83,7 +93,9 @@ def load_data_on_startup():
     except FileNotFoundError:
         print("⚠️ WARNING: Metadata file 'MergedResearchCenterWithTopic.csv' not found.")
     
+    # --- 3. Load Top Topics map (and strip keys) ---
     try:
+        # **IMPORTANT**: Change this to 'ITS_translated.csv' if that is your final file
         csv_to_load = 'data/processed_data.csv' 
         
         researcher_topic_df = pd.read_csv(csv_to_load) 
@@ -91,21 +103,50 @@ def load_data_on_startup():
         researcher_topic_df['ResearcherName'] = researcher_topic_df['ResearcherName'].str.strip()
         
         global top_topics_map
-        
         def get_top_topics(group, n=4):
             return group.nlargest(n, 'Percentage')['TopicName'].tolist()
-
         top_topics_map = researcher_topic_df.groupby('ResearcherName').apply(get_top_topics).to_dict()
-        
         print("✅ Loaded top topics map for all researchers.")
-
-    except FileNotFoundError:
-        print(f"⚠️ WARNING: File '{csv_to_load}' not found. Top topics will not be available.")
-    except KeyError as e:
-        print(f"❌ CRITICAL ERROR: A required column is missing from '{csv_to_load}'. Missing column: {e}")
     except Exception as e:
         print(f"⚠️ Error loading top topic map: {e}")
 
+    # --- 4. Load Faculty & Department data (and strip keys) ---
+    print("\n🔄 Building faculty and department maps from Excel files...")
+    global researcher_to_faculty_map, researcher_to_department_map
+    faculty_files = [
+        'dataFDKBD.xlsx', 'dataFKK.xlsx', 'dataFSAD.xlsx', 
+        'dataFTEIC.xlsx', 'dataFTIRS.xlsx', 'dataFTK.xlsx', 
+        'dataFTSPK.xlsx', 'dataFV.xlsx', 'dataSIMT.xlsx'
+    ]
+    possible_name_columns = ['NAMA', 'ResearcherName', 'Nama Peneliti']
+
+    for file_name in faculty_files:
+        file_path = os.path.join('data', file_name)
+        try:
+            faculty_name = file_name.replace('data', '').replace('.xlsx', '')
+            all_sheets = pd.read_excel(file_path, sheet_name=None)
+            
+            for department_name, df_sheet in all_sheets.items(): 
+                name_column_found = None
+                for col in possible_name_columns:
+                    if col in df_sheet.columns:
+                        name_column_found = col
+                        break
+                
+                if name_column_found:
+                    for researcher in df_sheet[name_column_found]:
+                        if pd.notna(researcher):
+                            clean_name = researcher.strip()
+                            researcher_to_faculty_map[clean_name] = faculty_name
+                            researcher_to_department_map[clean_name] = department_name
+                else:
+                    print(f"  - ⚠️ Warning: No name column found in {file_path} -> {department_name}")
+        except FileNotFoundError:
+            print(f"  - ⚠️ Warning: Faculty file not found: {file_path}")
+        except Exception as e:
+            print(f"  - ⚠️ Error processing {file_path}: {e}")
+    print(f"✅ Faculty map created with {len(researcher_to_faculty_map)} entries.")
+    
     print("--- Startup complete. ---")
 
 
@@ -177,15 +218,60 @@ def get_recommendations(query: Query):
     formatted_results = []
     for name, score in top_10:
         clean_name = name.strip()
-        faculty = researcher_to_center_map.get(clean_name, "Unknown Center") 
         
-        focus_topics = top_topics_map.get(clean_name, []) 
+        # --- Perform all three lookups ---
+        research_center = researcher_to_center_map.get(clean_name, "Unknown Center") 
+        faculty = researcher_to_faculty_map.get(clean_name, "Unknown Faculty")
+        department = researcher_to_department_map.get(clean_name, "Unknown Department")
+        focus_topics = top_topics_map.get(clean_name, [])
+        # -------------------------------------------
         
         formatted_results.append({
             "name": name, 
             "score": float(score), 
             "faculty": faculty,
-            "focus_topics": focus_topics 
+            "department": department,
+            "research_center": research_center, 
+            "focus_topics": focus_topics
         })
     
     return {"recommendations": formatted_results}
+
+
+@app.get("/faculties")
+def get_all_faculties():
+    """
+    Returns a simple list of all unique faculty names.
+    """
+    unique_faculties = sorted(list(set(researcher_to_faculty_map.values())))
+    return {"faculties": unique_faculties}
+
+
+@app.get("/faculty-data/{faculty_name}")
+def get_faculty_data(faculty_name: str):
+    """
+    Gets all departments and researchers for a specific faculty.
+    Returns data grouped by department.
+    """
+    print(f"Received request for faculty: {faculty_name}")
+    
+    departments_data = {}
+
+    for name, faculty in researcher_to_faculty_map.items():
+        if faculty == faculty_name:
+            clean_name = name.strip()
+            department = researcher_to_department_map.get(clean_name, "Unknown Department")
+            research_center = researcher_to_center_map.get(clean_name, "Unknown Center")
+            focus_topics = top_topics_map.get(clean_name, [])
+            
+            researcher_info = {
+                "name": name,
+                "research_center": research_center,
+                "focus_topics": focus_topics
+            }
+            
+            if department not in departments_data:
+                departments_data[department] = []
+            departments_data[department].append(researcher_info)
+    
+    return {"faculty": faculty_name, "departments": departments_data}

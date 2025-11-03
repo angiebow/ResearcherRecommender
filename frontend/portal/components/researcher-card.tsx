@@ -1,18 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Lightbulb } from "lucide-react"; 
+import { Lightbulb, Building, School, User } from "lucide-react"; 
 
 interface ResearcherCardProps {
   rank: number;
   name: string;
   score: number;
   faculty: string;
+  department: string;
+  research_center: string;
   metric: string;
-  focus_topics: string[]; 
+  focus_topics: string[];
 }
 
-export default function ResearcherCard({ rank, name, score, faculty, metric, focus_topics }: ResearcherCardProps) {
+export default function ResearcherCard({ 
+  rank, name, score, faculty, department, research_center, metric, focus_topics 
+}: ResearcherCardProps) {
+  
   const isDistanceMetric = ['Minkowski', 'Kullback-Leibler'].includes(metric);
   const scoreLabel = isDistanceMetric ? "Distance" : "Similarity Score";
   const scoreSuffix = isDistanceMetric ? "(Lower is better)" : "(Higher is better)";
@@ -24,7 +29,15 @@ export default function ResearcherCard({ rank, name, score, faculty, metric, foc
           <CardTitle className="text-lg">{name}</CardTitle>
           <Badge variant="secondary">#{rank}</Badge>
         </div>
-        <CardDescription>{faculty}</CardDescription>
+        <CardDescription className="flex items-center text-xs pt-1">
+          <School className="w-4 h-4 mr-2 flex-shrink-0" /> {faculty}
+        </CardDescription>
+        <CardDescription className="flex items-center text-xs">
+          <User className="w-4 h-4 mr-2 flex-shrink-0" /> {department}
+        </CardDescription>
+        <CardDescription className="flex items-center text-xs">
+          <Building className="w-4 h-4 mr-2 flex-shrink-0" /> {research_center}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4">
@@ -60,7 +73,14 @@ export function ResearcherCardSkeleton() {
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-5 w-8" />
       </div>
+      <Skeleton className="h-4 w-1/2 mb-2" /> 
+      <Skeleton className="h-4 w-1/3 mb-2" />
       <Skeleton className="h-4 w-1/2 mb-4" />
+      
+      <Skeleton className="h-4 w-1/4 mb-2" />
+      <Skeleton className="h-4 w-full mb-1" />
+      <Skeleton className="h-4 w-2/3 mb-4" />
+
       <Skeleton className="h-4 w-1/3" />
     </div>
   );
