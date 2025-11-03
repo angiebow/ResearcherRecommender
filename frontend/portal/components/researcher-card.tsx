@@ -1,16 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Lightbulb } from "lucide-react";
 
 interface ResearcherCardProps {
   rank: number;
   name: string;
   score: number;
   faculty: string;
-  metric: string; 
+  metric: string;
+  focus_topic: string;
 }
 
-export default function ResearcherCard({ rank, name, score, faculty, metric }: ResearcherCardProps) {
+export default function ResearcherCard({ rank, name, score, faculty, metric, focus_topic }: ResearcherCardProps) {
   const isDistanceMetric = ['Minkowski', 'Kullback-Leibler'].includes(metric);
   const scoreLabel = isDistanceMetric ? "Distance" : "Similarity Score";
   const scoreSuffix = isDistanceMetric ? "(Lower is better)" : "(Higher is better)";
@@ -25,6 +27,13 @@ export default function ResearcherCard({ rank, name, score, faculty, metric }: R
         <CardDescription>{faculty}</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex items-start text-sm mb-4">
+          <Lightbulb className="w-4 h-4 mr-2 mt-0.5 text-yellow-400 flex-shrink-0" />
+          <span className="text-slate-400">
+            Focus: <span className="text-white">{focus_topic}</span>
+          </span>
+        </div>
+
         <div className="text-sm">
           {scoreLabel}: 
           <span className="font-bold text-blue-400 ml-2">{score.toFixed(4)}</span>

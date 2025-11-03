@@ -49,7 +49,6 @@ MODEL_MAPPING = {
     "XLNet": {"name": 'xlnet-base-cased', "type": "transformers"},
     "MPNet": {"name": 'sentence-transformers/all-mpnet-base-v2', "type": "sentence-transformers"},
 }
-
 EMBEDDING_MAPPING = {
     "BERT": "data/BERTResearcher.pkl",
     "DistilBERT": "data/DistilBERTResearcher.pkl",
@@ -61,6 +60,8 @@ EMBEDDING_MAPPING = {
 loaded_models = {}
 loaded_embeddings = {}
 researcher_to_center_map = {}
+researcher_topic_df = pd.DataFrame() 
+top_topic_map = {}                   
 
 @app.on_event("startup")
 def load_data_on_startup():
@@ -69,7 +70,8 @@ def load_data_on_startup():
     for model_name, file_path in EMBEDDING_MAPPING.items():
         try:
             with open(file_path, 'rb') as f:
-                loaded_embeddings[model_name] = pickle.load(f)
+                raw_data = pickle.load(f)
+                loaded_embeddings[model_name] = {k.strip(): v for k, v in raw_data.items()}
             print(f"✅ Loaded embeddings for: {model_name}")
         except FileNotFoundError:
             print(f"⚠️ WARNING: Embedding file not found for {model_name} at '{file_path}'")
@@ -77,10 +79,32 @@ def load_data_on_startup():
     try:
         df_metadata = pd.read_csv('data/MergedResearchCenterWithTopic.csv')
         global researcher_to_center_map
-        researcher_to_center_map = pd.Series(df_metadata.ResearchCenter.values, index=df_metadata.Researcher).to_dict()
+        researcher_to_center_map = pd.Series(df_metadata.ResearchCenter.values, index=df_metadata.Researcher.str.strip()).to_dict()
         print("✅ Loaded researcher-to-center metadata.")
     except FileNotFoundError:
         print("⚠️ WARNING: Metadata file 'MergedResearchCenterWithTopic.csv' not found.")
+    
+    try:
+        global researcher_topic_df
+        csv_to_load = 'data/processed_data.csv' 
+        researcher_topic_df = pd.read_csv(csv_to_load) 
+        
+        researcher_topic_df['ResearcherName'] = researcher_topic_df['ResearcherName'].str.strip()
+        
+        global top_topic_map
+        idx_max = researcher_topic_df.groupby('ResearcherName')['Percentage'].idxmax()
+        
+        top_topic_map = researcher_topic_df.loc[idx_max].set_index('ResearcherName')['TopicName'].to_dict()
+        
+        print("✅ Loaded top topic map for all researchers.")
+
+    except FileNotFoundError:
+        print(f"⚠️ WARNING: File '{csv_to_load}' not found. Top topics will not be available.")
+    except KeyError as e:
+        print(f"❌ CRITICAL ERROR: A required column is missing from '{csv_to_load}'. Missing column: {e}")
+    except Exception as e:
+        print(f"⚠️ Error loading top topic map: {e}")
+
     print("--- Startup complete. ---")
 
 
@@ -114,7 +138,7 @@ def get_recommendations(query: Query):
     else: 
         model = loaded_models[model_name]
         query_vector = model.encode(query.topic)
-
+    
     researcher_names = list(embedding_data.keys())
     researcher_vectors = np.array(list(embedding_data.values()))
 
@@ -125,23 +149,19 @@ def get_recommendations(query: Query):
     if metric == 'Cosine Similarity':
         scores = cosine_similarity([query_vector], researcher_vectors)[0]
         results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=True)
-    
     elif metric == 'Minkowski':
-        scores = [minkowski(query_vector, vec, p=3) for vec in researcher_vectors] # p=3 as per our experiments
-        results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=False) # Lower is better
-    
+        scores = [minkowski(query_vector, vec, p=3) for vec in researcher_vectors]
+        results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=False)
     elif metric == 'Hamming':
         binarized_query = binarize_vector(query_vector)
         distances = [hamming(binarized_query, binarize_vector(vec)) for vec in researcher_vectors]
         scores = [1 - d for d in distances]
         results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=True)
-
     elif metric == 'Jaccard':
         binarized_query = binarize_vector(query_vector)
         distances = [jaccard(binarized_query, binarize_vector(vec)) for vec in researcher_vectors]
         scores = [1 - d for d in distances]
         results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=True)
-
     elif metric == 'Kullback-Leibler':
         query_prob = softmax(l2_normalize(query_vector))
         scores = []
@@ -149,17 +169,21 @@ def get_recommendations(query: Query):
             researcher_prob = softmax(l2_normalize(vec))
             divergence = kl_div(query_prob, researcher_prob).sum()
             scores.append(divergence)
-        results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=False) # Lower is better
-    
+        results = sorted(zip(researcher_names, scores), key=lambda item: item[1], reverse=False)
+
     top_10 = results[:10]
     
     formatted_results = []
     for name, score in top_10:
-        faculty = researcher_to_center_map.get(name, "Unknown Center") 
+        clean_name = name.strip()
+        faculty = researcher_to_center_map.get(clean_name, "Unknown Center") 
+        focus_topic = top_topic_map.get(clean_name, "N/A") 
+        
         formatted_results.append({
             "name": name, 
             "score": float(score), 
-            "faculty": faculty
+            "faculty": faculty,
+            "focus_topic": focus_topic 
         })
     
     return {"recommendations": formatted_results}

@@ -11,6 +11,7 @@ type Researcher = {
   name: string;
   score: number;
   faculty: string;
+  focus_topic: string;
 };
 
 export default function RecommenderPage() {
@@ -107,6 +108,7 @@ export default function RecommenderPage() {
             score={researcher.score}
             faculty={researcher.faculty}
             metric={metric} 
+            focus_topic={researcher.focus_topic}
           />
         ))}
       </div>
