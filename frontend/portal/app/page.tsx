@@ -72,7 +72,7 @@ export default function RecommenderPage() {
           <Select value={metric} onValueChange={setMetric}>
             <SelectTrigger className="bg-slate-800 border-slate-700 h-12 text-md"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Cosine Similarity">Cosine Similarity</SelectItem>
+              <SelectItem value="Cosine Similarity">Cosine</SelectItem>
               <SelectItem value="Hamming">Hamming</SelectItem>
               <SelectItem value="Jaccard">Jaccard</SelectItem>
               <SelectItem value="Minkowski">Minkowski</SelectItem>
