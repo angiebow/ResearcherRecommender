@@ -14,7 +14,7 @@ type Researcher = {
 };
 
 export default function RecommenderPage() {
-  const [query, setQuery] = useState<string>('natural gas risk analysis in Southeast Asia');
+  const [query, setQuery] = useState<string>(''); 
   const [model, setModel] = useState<string>('BERT'); 
   const [metric, setMetric] = useState<string>('Cosine Similarity'); 
   const [results, setResults] = useState<Researcher[]>([]);
@@ -85,7 +85,9 @@ export default function RecommenderPage() {
       <div className="flex w-full items-center space-x-2 mb-10">
         <Input
           type="text"
-          value={query} onChange={(e) => setQuery(e.target.value)}
+          placeholder="Input Topic"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           className="bg-slate-800 border-slate-700 h-12 text-md"
         />
         <Button size="lg" onClick={handleSearch} disabled={isLoading} className="h-12">
@@ -111,7 +113,10 @@ export default function RecommenderPage() {
       
       {!isLoading && hasSearched && results.length === 0 && (
           <div className="col-span-3 text-center py-10">
-            <p className="text-slate-500">No results found. Please try a different query.</p>
+            {hasSearched ? 
+              <p className="text-slate-500">No results found. Please try a different query.</p> :
+              <p className="text-slate-500">Please enter a topic to begin your search.</p>
+            }
           </div>
       )}
     </div>
