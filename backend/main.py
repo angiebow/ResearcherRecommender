@@ -60,8 +60,7 @@ EMBEDDING_MAPPING = {
 loaded_models = {}
 loaded_embeddings = {}
 researcher_to_center_map = {}
-researcher_topic_df = pd.DataFrame() 
-top_topic_map = {}                   
+top_topics_map = {}
 
 @app.on_event("startup")
 def load_data_on_startup():
@@ -85,18 +84,20 @@ def load_data_on_startup():
         print("⚠️ WARNING: Metadata file 'MergedResearchCenterWithTopic.csv' not found.")
     
     try:
-        global researcher_topic_df
         csv_to_load = 'data/processed_data.csv' 
+        
         researcher_topic_df = pd.read_csv(csv_to_load) 
         
         researcher_topic_df['ResearcherName'] = researcher_topic_df['ResearcherName'].str.strip()
         
-        global top_topic_map
-        idx_max = researcher_topic_df.groupby('ResearcherName')['Percentage'].idxmax()
+        global top_topics_map
         
-        top_topic_map = researcher_topic_df.loc[idx_max].set_index('ResearcherName')['TopicName'].to_dict()
+        def get_top_topics(group, n=4):
+            return group.nlargest(n, 'Percentage')['TopicName'].tolist()
+
+        top_topics_map = researcher_topic_df.groupby('ResearcherName').apply(get_top_topics).to_dict()
         
-        print("✅ Loaded top topic map for all researchers.")
+        print("✅ Loaded top topics map for all researchers.")
 
     except FileNotFoundError:
         print(f"⚠️ WARNING: File '{csv_to_load}' not found. Top topics will not be available.")
@@ -177,13 +178,14 @@ def get_recommendations(query: Query):
     for name, score in top_10:
         clean_name = name.strip()
         faculty = researcher_to_center_map.get(clean_name, "Unknown Center") 
-        focus_topic = top_topic_map.get(clean_name, "N/A") 
+        
+        focus_topics = top_topics_map.get(clean_name, []) 
         
         formatted_results.append({
             "name": name, 
             "score": float(score), 
             "faculty": faculty,
-            "focus_topic": focus_topic 
+            "focus_topics": focus_topics 
         })
     
     return {"recommendations": formatted_results}

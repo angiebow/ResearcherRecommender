@@ -11,7 +11,7 @@ type Researcher = {
   name: string;
   score: number;
   faculty: string;
-  focus_topic: string;
+  focus_topics: string[]; 
 };
 
 export default function RecommenderPage() {
@@ -73,7 +73,7 @@ export default function RecommenderPage() {
           <Select value={metric} onValueChange={setMetric}>
             <SelectTrigger className="bg-slate-800 border-slate-700 h-12 text-md"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="Cosine Similarity">Cosine</SelectItem>
+              <SelectItem value="Cosine Similarity">Cosine Similarity</SelectItem>
               <SelectItem value="Hamming">Hamming</SelectItem>
               <SelectItem value="Jaccard">Jaccard</SelectItem>
               <SelectItem value="Minkowski">Minkowski</SelectItem>
@@ -87,8 +87,7 @@ export default function RecommenderPage() {
         <Input
           type="text"
           placeholder="Input Topic"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={query} onChange={(e) => setQuery(e.target.value)}
           className="bg-slate-800 border-slate-700 h-12 text-md"
         />
         <Button size="lg" onClick={handleSearch} disabled={isLoading} className="h-12">
@@ -108,7 +107,7 @@ export default function RecommenderPage() {
             score={researcher.score}
             faculty={researcher.faculty}
             metric={metric} 
-            focus_topic={researcher.focus_topic}
+            focus_topics={researcher.focus_topics} 
           />
         ))}
       </div>

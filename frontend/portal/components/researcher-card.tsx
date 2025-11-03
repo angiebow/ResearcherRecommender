@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react"; 
 
 interface ResearcherCardProps {
   rank: number;
@@ -9,10 +9,10 @@ interface ResearcherCardProps {
   score: number;
   faculty: string;
   metric: string;
-  focus_topic: string;
+  focus_topics: string[]; 
 }
 
-export default function ResearcherCard({ rank, name, score, faculty, metric, focus_topic }: ResearcherCardProps) {
+export default function ResearcherCard({ rank, name, score, faculty, metric, focus_topics }: ResearcherCardProps) {
   const isDistanceMetric = ['Minkowski', 'Kullback-Leibler'].includes(metric);
   const scoreLabel = isDistanceMetric ? "Distance" : "Similarity Score";
   const scoreSuffix = isDistanceMetric ? "(Lower is better)" : "(Higher is better)";
@@ -27,11 +27,20 @@ export default function ResearcherCard({ rank, name, score, faculty, metric, foc
         <CardDescription>{faculty}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex items-start text-sm mb-4">
-          <Lightbulb className="w-4 h-4 mr-2 mt-0.5 text-yellow-400 flex-shrink-0" />
-          <span className="text-slate-400">
-            Focus: <span className="text-white">{focus_topic}</span>
-          </span>
+        <div className="mb-4">
+          <div className="flex items-center text-sm mb-2">
+            <Lightbulb className="w-4 h-4 mr-2 text-yellow-400 flex-shrink-0" />
+            <span className="text-slate-400">Focus Topics:</span>
+          </div>
+          {focus_topics && focus_topics.length > 0 ? (
+            <ul className="list-disc list-inside text-sm text-white pl-2">
+              {focus_topics.map((topic, index) => (
+                <li key={index}>{topic}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-slate-500 pl-2">N/A</p>
+          )}
         </div>
 
         <div className="text-sm">
