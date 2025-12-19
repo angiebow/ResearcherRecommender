@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import ResearcherCard, { ResearcherCardSkeleton } from '@/components/researcher-card';
+import { Textarea } from "@/components/ui/textarea";
+import { useRef } from "react";
 
 type Researcher = {
   name: string;
@@ -85,15 +87,21 @@ export default function RecommenderPage() {
           </Select>
         </div>
       </div>
-      
-      <div className="flex w-full items-center space-x-2 mb-10">
-        <Input
-          type="text"
+
+      <div className="flex w-full items-start gap-2 mb-10">
+        <Textarea
           placeholder="Input Topic"
-          value={query} onChange={(e) => setQuery(e.target.value)}
-          className="bg-slate-800 border-slate-700 h-12 text-md"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="flex-1 min-w-0 w-full bg-slate-800 border-slate-700 min-h-[120px] text-md resize-none"
         />
-        <Button size="lg" onClick={handleSearch} disabled={isLoading} className="h-12">
+
+        <Button
+          size="lg"
+          onClick={handleSearch}
+          disabled={isLoading}
+          className="h-12 mt-1 shrink-0"
+        >
           <Search className="mr-2 h-5 w-5" /> Search
         </Button>
       </div>
