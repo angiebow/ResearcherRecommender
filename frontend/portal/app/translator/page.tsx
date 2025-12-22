@@ -28,7 +28,7 @@ export default function TranslatorPage() {
     setResult("");
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_TRANSLATOR_API || "http://127.0.0.1:8001";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const res = await fetch(`${apiUrl}/translate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
