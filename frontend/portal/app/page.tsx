@@ -209,11 +209,11 @@ export default function RecommenderPage() {
             rank={index + 1}
             name={researcher.name}
             score={researcher.score}
-            faculty={researcher.faculty}
-            department={researcher.department}
-            research_center={researcher.research_center}
+            //faculty={researcher.faculty}
+            //department={researcher.department}
+            //research_center={researcher.research_center}
             metric={metric} 
-            focus_topics={researcher.focus_topics}
+            //focus_topics={researcher.focus_topics}
           />
         ))}
       </div>
