@@ -1,6 +1,6 @@
 'use client';
     
-import { Home, Search, User, Megaphone, Library } from "lucide-react";
+import { Home, Search, User, Megaphone, Library, Languages } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
   Sidebar,
@@ -19,6 +19,11 @@ const menuItems = [
   { title: "Browse by Faculty", href: "/faculty", icon: Library },
   { title: "Account", href: "#", icon: User },
   { title: "Announcement", href: "#", icon: Megaphone },
+  {
+    title: "Translator",
+    href: "/translator",
+    icon: Languages, 
+  }
 ];
 
 export function AppSidebar() {

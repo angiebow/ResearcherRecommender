@@ -95,7 +95,7 @@ def load_data_on_startup():
     
     # --- 3. Load Top Topics map (and strip keys) ---
     try:
-        # **IMPORTANT**: Change this to 'ITS_translated.csv' if that is your final file
+        # **IMPORTANT**: Change this to 'ITS_translated.csv' if that is final file
         csv_to_load = 'data/processed_data.csv' 
         
         researcher_topic_df = pd.read_csv(csv_to_load) 
