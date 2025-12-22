@@ -9,6 +9,13 @@ import ResearcherCard, { ResearcherCardSkeleton } from '@/components/researcher-
 import { Textarea } from "@/components/ui/textarea";
 import { useRef } from "react";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 type Researcher = {
   name: string;
   score: number;
@@ -58,6 +65,92 @@ export default function RecommenderPage() {
     <div>
        <h1 className="text-3xl font-bold mb-2">Researcher Recommendation</h1>
       <p className="text-slate-400 mb-8">Enter a research topic to find the most relevant experts from the institution.</p>
+
+      <Accordion type="multiple" className="mb-10">
+        {/* NDCG@5 */}
+        <AccordionItem value="ndcg">
+          <AccordionTrigger className="text-lg font-semibold">
+            NDCG@5 – Recommended Configuration
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border border-slate-700 rounded-lg">
+                <thead className="bg-slate-800 text-slate-300">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Rank</th>
+                    <th className="px-3 py-2 text-left">Model</th>
+                    <th className="px-3 py-2 text-left">Metric</th>
+                    <th className="px-3 py-2 text-left">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    [1, "MPNet", "Minkowski", 0.2827],
+                    [2, "MPNet", "KL Divergence", 0.2729],
+                    [3, "MPNet", "Cosine", 0.2504],
+                    [4, "MPNet", "Jaccard", 0.2375],
+                    [5, "MPNet", "Hamming", 0.2354],
+                    [6, "DistilBERT", "Minkowski", 0.1116],
+                    [7, "DistilBERT", "KL Divergence", 0.1081],
+                    [8, "DistilBERT", "Jaccard", 0.1016],
+                    [9, "DistilBERT", "Hamming", 0.093],
+                    [10, "DistilBERT", "Cosine", 0.0752],
+                  ].map(([rank, model, metric, score]) => (
+                    <tr key={rank} className="border-t border-slate-700">
+                      <td className="px-3 py-2">{rank}</td>
+                      <td className="px-3 py-2">{model}</td>
+                      <td className="px-3 py-2">{metric}</td>
+                      <td className="px-3 py-2">{score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* MAP@5 */}
+        <AccordionItem value="map">
+          <AccordionTrigger className="text-lg font-semibold">
+            MAP@5 - Recommended Configuration
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border border-slate-700 rounded-lg">
+                <thead className="bg-slate-800 text-slate-300">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Rank</th>
+                    <th className="px-3 py-2 text-left">Model</th>
+                    <th className="px-3 py-2 text-left">Metric</th>
+                    <th className="px-3 py-2 text-left">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    [1, "MPNet", "Minkowski", 0.2253],
+                    [2, "MPNet", "KL Divergence", 0.2187],
+                    [3, "MPNet", "Cosine", 0.2013],
+                    [4, "MPNet", "Hamming", 0.1873],
+                    [5, "MPNet", "Jaccard", 0.1837],
+                    [6, "DistilBERT", "KL Divergence", 0.0913],
+                    [7, "DistilBERT", "Minkowski", 0.089],
+                    [8, "DistilBERT", "Jaccard", 0.0757],
+                    [9, "DistilBERT", "Cosine", 0.0667],
+                    [10, "DistilBERT", "Hamming", 0.064],
+                  ].map(([rank, model, metric, score]) => (
+                    <tr key={rank} className="border-t border-slate-700">
+                      <td className="px-3 py-2">{rank}</td>
+                      <td className="px-3 py-2">{model}</td>
+                      <td className="px-3 py-2">{metric}</td>
+                      <td className="px-3 py-2">{score}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div>
@@ -90,7 +183,7 @@ export default function RecommenderPage() {
 
       <div className="flex w-full items-start gap-2 mb-10">
         <Textarea
-          placeholder="Input Topic"
+          placeholder="Input Topic in English"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="flex-1 min-w-0 w-full bg-slate-800 border-slate-700 min-h-[120px] text-md resize-none"
