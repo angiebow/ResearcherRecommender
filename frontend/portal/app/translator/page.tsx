@@ -72,33 +72,47 @@ export default function TranslatorPage() {
         placeholder="Enter text to translate..."
         value={text}
         onChange={(e) => setText(e.target.value)}
-        className="min-h-[150px] mb-4 bg-slate-800 border-slate-700"
+        className="
+          min-h-[150px] mb-4
+          bg-white border-gray-300 text-gray-900
+          dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100
+        "
       />
 
       <Button onClick={handleTranslate} disabled={loading || !text}>
         {loading ? "Translating..." : "Translate"}
       </Button>
 
-{result && (
-  <div className="mt-6 p-4 rounded-lg bg-slate-900 border border-slate-700 relative">
-    <div className="flex justify-between items-center mb-2">
-      <h3 className="font-semibold">Translation Result</h3>
+      {result && (
+        <div
+          className="
+            mt-6 p-4 rounded-lg border relative
+            bg-gray-100 border-gray-300
+            dark:bg-slate-900 dark:border-slate-700
+          "
+        >
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-semibold
+                          text-gray-900 dark:text-gray-100">
+              Translation Result
+            </h3>
 
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={handleCopy}
-        className="text-xs"
-      >
-        {copied ? "Copied!" : "Copy"}
-      </Button>
-    </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleCopy}
+              className="text-xs"
+            >
+              {copied ? "Copied!" : "Copy"}
+            </Button>
+          </div>
 
-    <p className="text-slate-200 whitespace-pre-wrap">
-      {result}
-    </p>
-  </div>
-)}
+          <p className="whitespace-pre-wrap
+                        text-gray-800 dark:text-slate-200">
+            {result}
+          </p>
+        </div>
+      )}
 
     </div>
   );

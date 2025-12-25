@@ -74,8 +74,14 @@ export default function RecommenderPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border border-slate-700 rounded-lg">
-                <thead className="bg-slate-800 text-slate-300">
+              <table className="
+                w-full text-sm rounded-lg border
+                border-gray-300 dark:border-slate-700
+              ">
+                <thead className="
+                  bg-gray-100 text-gray-700
+                  dark:bg-slate-800 dark:text-slate-300
+                ">
                   <tr>
                     <th className="px-3 py-2 text-left">Rank</th>
                     <th className="px-3 py-2 text-left">Model</th>
@@ -116,8 +122,14 @@ export default function RecommenderPage() {
           </AccordionTrigger>
           <AccordionContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border border-slate-700 rounded-lg">
-                <thead className="bg-slate-800 text-slate-300">
+              <table className="
+                w-full text-sm rounded-lg border
+                border-gray-300 dark:border-slate-700
+              ">
+                <thead className="
+                  bg-gray-100 text-gray-700
+                  dark:bg-slate-800 dark:text-slate-300
+                ">
                   <tr>
                     <th className="px-3 py-2 text-left">Rank</th>
                     <th className="px-3 py-2 text-left">Model</th>
@@ -156,7 +168,14 @@ export default function RecommenderPage() {
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">Select Model</label>
           <Select value={model} onValueChange={setModel}>
-            <SelectTrigger className="bg-slate-800 border-slate-700 h-12 text-md"><SelectValue /></SelectTrigger>
+            <SelectTrigger
+              className="
+                h-12 text-md
+                bg-white border-gray-300 text-gray-900
+                dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100
+              "
+            >
+            <SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="BERT">BERT</SelectItem>
               <SelectItem value="DistilBERT">DistilBERT</SelectItem>
@@ -169,7 +188,14 @@ export default function RecommenderPage() {
         <div>
           <label className="block text-sm font-medium text-slate-400 mb-2">Select Metric</label>
           <Select value={metric} onValueChange={setMetric}>
-            <SelectTrigger className="bg-slate-800 border-slate-700 h-12 text-md"><SelectValue /></SelectTrigger>
+          <SelectTrigger
+            className="
+              h-12 text-md
+              bg-white border-gray-300 text-gray-900
+              dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100
+            "
+          >
+          <SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="Cosine Similarity">Cosine</SelectItem>
               <SelectItem value="Hamming">Hamming</SelectItem>
@@ -186,7 +212,11 @@ export default function RecommenderPage() {
           placeholder="Input Topic in English"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 min-w-0 w-full bg-slate-800 border-slate-700 min-h-[120px] text-md resize-none"
+          className="
+            flex-1 min-w-0 w-full min-h-[120px] resize-none text-md
+            bg-white border-gray-300 text-gray-900
+            dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100
+          "
         />
 
         <Button
