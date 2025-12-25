@@ -27,11 +27,22 @@ export default function ResearcherCard({
   const scoreSuffix = isDistanceMetric ? "(Lower is better)" : "(Higher is better)";
 
   return (
-    <Card className="bg-slate-950 border-slate-800 hover:border-blue-500 transition-colors flex flex-col justify-between">
+    <Card
+      className="
+        flex flex-col justify-between transition-colors
+        bg-white border-gray-300
+        hover:border-blue-500
+        dark:bg-slate-950 dark:border-slate-800
+      "
+    >
       <CardHeader>
         <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{name}</CardTitle>
-          <Badge variant="secondary">#{rank}</Badge>
+          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">
+            {name}
+          </CardTitle>
+          <Badge variant="secondary" className="text-gray-700 dark:text-gray-200">
+            #{rank}
+          </Badge>
         </div>
         {/* <CardDescription className="flex items-center text-xs pt-1">
           <School className="w-4 h-4 mr-2 flex-shrink-0" /> {faculty}
@@ -62,8 +73,12 @@ export default function ResearcherCard({
 
         <div className="text-sm">
           {scoreLabel}: 
-          <span className="font-bold text-blue-400 ml-2">{score.toFixed(4)}</span>
-          <p className="text-xs text-slate-500 mt-1">{scoreSuffix}</p>
+          <span className="font-bold ml-2 text-blue-600 dark:text-blue-400">
+            {score.toFixed(4)}
+          </span>
+          <p className="text-xs mt-1 text-gray-500 dark:text-slate-500">
+            {scoreSuffix}
+          </p>
         </div>
       </CardContent>
     </Card>
@@ -72,7 +87,13 @@ export default function ResearcherCard({
 
 export function ResearcherCardSkeleton() {
   return (
-    <div className="p-6 bg-slate-950 border border-slate-800 rounded-lg">
+    <div
+      className="
+        p-6 rounded-lg border
+        bg-white border-gray-300
+        dark:bg-slate-950 dark:border-slate-800
+      "
+    >
       <div className="flex justify-between items-start mb-2">
         <Skeleton className="h-5 w-3/4" />
         <Skeleton className="h-5 w-8" />
