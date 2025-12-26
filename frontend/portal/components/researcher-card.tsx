@@ -3,6 +3,20 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Lightbulb, Building, School, User } from "lucide-react"; 
 
+function generateScholarITSLink(fullName: string) {
+  const cleanedName = fullName
+    .replace(/prof\.?|dr\.?|ir\.?|drs\.?|ph\.d\.?|m\.sc\.?|m\.t\.?|s\.t\.?|dea/gi, "")
+    .replace(/,/g, "")
+    .trim();
+
+  const parts = cleanedName.split(/\s+/).slice(0, 2);
+
+  const slug = parts.join("-").toLowerCase();
+
+  return `https://scholar.its.ac.id/en/persons/${slug}/`;
+}
+
+
 interface ResearcherCardProps {
   rank: number;
   name: string;
@@ -38,7 +52,14 @@ export default function ResearcherCard({
       <CardHeader>
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg text-gray-900 dark:text-gray-100">
-            {name}
+            <a
+              href={generateScholarITSLink(name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline hover:text-blue-500 transition-colors"
+            >
+              {name}
+            </a>
           </CardTitle>
           <Badge variant="secondary" className="text-gray-700 dark:text-gray-200">
             #{rank}
